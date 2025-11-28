@@ -3,7 +3,7 @@
 Aplicativo React Native/Expo que consulta clima atual e previsao dos proximos 5 dias para cidades brasileiras usando a API do OpenWeatherMap.
 
 ## Funcionalidades
-- Dropdown com cidades brasileiras e busca manual (usa sufixo `,BR` para desambiguar).
+- Campo de busca digitavel com sugestoes dinamicas (geocoding OpenWeather) enquanto voce digita — ja lista cidades que comecam com as letras digitadas.
 - Cartao com temperatura, sensacao termica, umidade, vento, descricao em pt-br e icones customizados.
 - Previsao estendida: resumo diario para 5 dias (min/max) com icone do periodo das 12h.
 - Visual moderno com gradientes e icones do pacote Ionicons.
@@ -40,7 +40,7 @@ Aplicativo React Native/Expo que consulta clima atual e previsao dos proximos 5 
 
 ## Estrutura resumida
 - `App.js`: carrega `HomeScreen`.
-- `src/screens/HomeScreen.js`: dropdown, estados de erro/carregamento e disparo de `buscarClima`/`buscarPrevisao5Dias`.
+- `src/screens/HomeScreen.js`: campo de busca, sugestoes dinamicas, estados de erro/carregamento e disparo de `buscarClima`/`buscarPrevisao5Dias`.
 - `src/components/WeatherResult.js`: card com clima atual, umidade, vento e previsao horizontal de 5 dias com icones.
 - `src/services/weatherService.js`: chamadas `fetch` com `lang=pt_br` e `units=metric`, agrupando a previsao por dia.
 - `src/styles/*.js`: estilos da tela principal e do card de resultado.
@@ -51,6 +51,6 @@ Aplicativo React Native/Expo que consulta clima atual e previsao dos proximos 5 
 - Com sucesso, `WeatherResult` renderiza o card atual e a lista de proximos 5 dias; icones sao escolhidos pelo codigo `weather.icon`.
 
 ## Dicas e observacoes
-- A lista inicial contem cidades brasileiras, mas voce pode digitar qualquer outra; adicionar `,BR` ajuda a evitar cidades homonimas de outros paises.
+- Digite qualquer cidade; o auto-complete consulta a API de geocoding e traz sugestoes enquanto digita. Para garantir que seja Brasil, o app ja adiciona `,BR` quando voce apenas digita o nome.
 - Respostas ja chegam em unidades metricas e pt-br, sem conversao adicional.
 - Licenca 0BSD conforme `package.json`.

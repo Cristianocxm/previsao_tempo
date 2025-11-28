@@ -36,71 +36,17 @@ export default StyleSheet.create({
     padding: 2,
   },
 
-  dropdown: {
+  searchContainer: {
     width: "100%",
     height: 64,
     backgroundColor: "rgba(255,255,255,0.08)",
     borderRadius: 14,
-    paddingHorizontal: 16,
+    paddingHorizontal: 12,
     borderWidth: 1,
     borderColor: "rgba(255,255,255,0.25)",
-    justifyContent: "center",
-  },
-
-  dropdownPlaceholder: {
-    color: "rgba(255,255,255,0.75)",
-    fontSize: 16,
-    fontWeight: "500",
-  },
-
-  dropdownSelected: {
-    color: "#fff",
-    fontSize: 18,
-    fontWeight: "800",
-  },
-
-  dropdownIcon: {
-    width: 22,
-    height: 22,
-  },
-
-  dropdownLeftIcon: {
-    marginRight: 8,
-  },
-
-  dropdownItem: {
-    backgroundColor: "rgba(8,22,46,0.9)",
-    borderBottomWidth: 1,
-    borderBottomColor: "rgba(255,255,255,0.06)",
-    paddingVertical: 12,
-  },
-
-  dropdownItemText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-
-  botao: {
-    backgroundColor: "#4a90e2",
-    padding: 15,
-    borderRadius: 10,
-    width: "100%",
+    flexDirection: "row",
     alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 4,
-
-    marginBottom: 15,
-  },
-
-  textoBotao: {
-    color: "#fff",
-    fontSize: 18,
-    fontWeight: "700",
-    letterSpacing: 0.3,
+    gap: 10,
   },
 
   erro: {
@@ -108,5 +54,57 @@ export default StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
     marginTop: 10,
+  },
+
+  inputIcon: {
+    marginRight: 8,
+  },
+
+  searchInput: {
+    flex: 1,
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+
+  searchButton: {
+    backgroundColor: "#4a90e2",
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.2)",
+  },
+
+  searchButtonText: {
+    color: "#fff",
+    fontSize: 14,
+    fontWeight: "800",
+    letterSpacing: 0.3,
+  },
+
+  sugestoesBox: {
+    width: "100%",
+    marginTop: 10,
+    backgroundColor: "rgba(8,22,46,0.92)",
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.08)",
+    overflow: "hidden",
+  },
+
+  sugestaoItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "rgba(255,255,255,0.05)",
+  },
+
+  sugestaoText: {
+    color: "#fff",
+    fontSize: 15,
+    fontWeight: "600",
   },
 });

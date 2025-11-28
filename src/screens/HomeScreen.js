@@ -1,44 +1,68 @@
-import React, { useMemo, useState } from "react";
-import { View, Text } from "react-native";
-import { Dropdown } from "react-native-element-dropdown";
-import { buscarClima, buscarPrevisao5Dias } from "../services/weatherService";
+import React, { useEffect, useRef, useState } from "react";
+import { View, Text, TextInput, TouchableOpacity, Keyboard } from "react-native";
+import {
+  buscarClima,
+  buscarPrevisao5Dias,
+  buscarSugestoesCidade,
+} from "../services/weatherService";
 import WeatherResult from "../components/WeatherResult";
 import styles from "../styles/homeStyles";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 
 export default function HomeScreen() {
-  const [cidade, setCidade] = useState("");
+  const [inputCidade, setInputCidade] = useState("");
+  const [cidadeValor, setCidadeValor] = useState("");
   const [focus, setFocus] = useState(false);
   const [dados, setDados] = useState(null);
   const [previsao, setPrevisao] = useState([]);
+  const [sugestoes, setSugestoes] = useState([]);
   const [erro, setErro] = useState("");
   const [loading, setLoading] = useState(false);
+  const debounceRef = useRef(null);
+  const buscaRef = useRef(0);
 
-  const cidades = [
-    { label: "Sao Paulo", value: "Sao Paulo,BR" },
-    { label: "Rio de Janeiro", value: "Rio de Janeiro,BR" },
-    { label: "Belo Horizonte", value: "Belo Horizonte,BR" },
-    { label: "Curitiba", value: "Curitiba,BR" },
-    { label: "Fortaleza", value: "Fortaleza,BR" },
-    { label: "Salvador", value: "Salvador,BR" },
-  ];
+  useEffect(() => {
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current);
+    }
 
-  const listaCidades = useMemo(() => {
-    if (!cidade) return cidades;
-    const selecionada = cidades.find((c) => c.value === cidade);
-    const demais = cidades.filter((c) => c.value !== cidade);
-    return selecionada ? [selecionada, ...demais] : cidades;
-  }, [cidade]);
+    if (!inputCidade.trim()) {
+      setSugestoes([]);
+      return undefined;
+    }
+
+    debounceRef.current = setTimeout(async () => {
+      const token = ++buscaRef.current;
+      const lista = await buscarSugestoesCidade(inputCidade);
+      if (buscaRef.current === token) {
+        setSugestoes(lista);
+      }
+    }, 350);
+
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, [inputCidade]);
+
+  const cidadeNormalizada = () => {
+    const texto = inputCidade.trim();
+    if (cidadeValor) return cidadeValor;
+    if (!texto) return "";
+    return texto.includes(",") ? texto : `${texto},BR`;
+  };
 
   const handleBuscar = async (cidadeSelecionada) => {
-    const cidadeFinal = cidadeSelecionada || cidade;
+    const cidadeFinal = cidadeSelecionada || cidadeNormalizada();
 
     if (!cidadeFinal) {
-      setErro("Selecione uma cidade.");
+      setErro("Digite ou selecione uma cidade.");
       return;
     }
 
+    Keyboard.dismiss();
+    setFocus(false);
+    setErro("");
     setLoading(true);
     const [climaAtual, previsao5Dias] = await Promise.all([
       buscarClima(cidadeFinal),
@@ -54,6 +78,7 @@ export default function HomeScreen() {
     }
 
     setDados(climaAtual);
+    setSugestoes([]);
 
     if (Array.isArray(previsao5Dias)) {
       setErro("");
@@ -76,41 +101,68 @@ export default function HomeScreen() {
             end={{ x: 1, y: 1 }}
             style={styles.dropdownGradient}
           >
-            <Dropdown
+            <View
               style={[
-                styles.dropdown,
+                styles.searchContainer,
                 focus && { borderColor: "#5fb0ff", borderWidth: 2 },
               ]}
-              data={listaCidades}
-              labelField="label"
-              valueField="value"
-              placeholder="Selecione a cidade"
-              placeholderStyle={styles.dropdownPlaceholder}
-              selectedTextStyle={styles.dropdownSelected}
-              iconStyle={styles.dropdownIcon}
-              activeColor="rgba(21,42,76,0.5)"
-              itemContainerStyle={styles.dropdownItem}
-              itemTextStyle={styles.dropdownItemText}
-              containerStyle={{ borderRadius: 12, overflow: "hidden" }}
-              value={cidade}
-              renderLeftIcon={() => (
-                <Ionicons
-                  name="location-outline"
-                  size={22}
-                  color="#fff"
-                  style={styles.dropdownLeftIcon}
-                />
-              )}
-              onFocus={() => setFocus(true)}
-              onBlur={() => setFocus(false)}
-              onChange={async (item) => {
-                setCidade(item.value);
-                setFocus(false);
-                await handleBuscar(item.value);
-              }}
-            />
+            >
+              <Ionicons
+                name="search"
+                size={20}
+                color="#d9e6ff"
+                style={styles.inputIcon}
+              />
+              <TextInput
+                style={styles.searchInput}
+                placeholder="Digite a cidade"
+                placeholderTextColor="rgba(255,255,255,0.7)"
+                value={inputCidade}
+                onChangeText={(text) => {
+                  setInputCidade(text);
+                  setCidadeValor("");
+                }}
+                onSubmitEditing={() => handleBuscar()}
+                returnKeyType="search"
+                onFocus={() => setFocus(true)}
+                onBlur={() => setFocus(false)}
+              />
+              <TouchableOpacity
+                onPress={() => handleBuscar()}
+                style={styles.searchButton}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.searchButtonText}>Buscar</Text>
+              </TouchableOpacity>
+            </View>
           </LinearGradient>
         </View>
+
+        {sugestoes.length > 0 ? (
+          <View style={styles.sugestoesBox}>
+            {sugestoes.map((item) => (
+              <TouchableOpacity
+                key={item.id || item.value}
+                style={styles.sugestaoItem}
+                activeOpacity={0.8}
+                onPress={() => {
+                  setInputCidade(item.label);
+                  setCidadeValor(item.value);
+                  Keyboard.dismiss();
+                  handleBuscar(item.value);
+                }}
+              >
+                <Ionicons
+                  name="location-outline"
+                  size={18}
+                  color="#cfe1ff"
+                  style={{ marginRight: 8 }}
+                />
+                <Text style={styles.sugestaoText}>{item.label}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        ) : null}
 
         {erro ? <Text style={styles.erro}>{erro}</Text> : null}
 
